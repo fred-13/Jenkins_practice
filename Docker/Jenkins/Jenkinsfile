@@ -1,3 +1,5 @@
+// Pipeline_Build_CPP_APP
+
 pipeline {
     agent any
 
@@ -7,9 +9,9 @@ pipeline {
                 build 'Build_Ubuntu_image_with_CMake'
             }
         }
-        stage('Build_CMake_Image') {
+        stage('Build_Hello_CMake_Image') {
             steps {
-                build 'Build_CMake_Image'
+                build 'Build_Hello_CMake_Image'
             }
         }
     }

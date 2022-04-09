@@ -14,7 +14,7 @@ Vagrant.configure(2) do |config|
       testvm.vm.network "forwarded_port", guest: 8080, host: 8080
       testvm.vm.network "forwarded_port", guest: 50000, host: 50000
       testvm.vm.hostname = "jenkins"
-      testvm.vm.provision "file", source: "./docker", destination: "$HOME/docker"
+      testvm.vm.provision "file", source: "./Docker", destination: "$HOME/Docker"
       testvm.vm.provision "shell", inline: <<-SHELL
         sudo apt-get update
         sudo apt-get upgrade -y
@@ -24,9 +24,11 @@ Vagrant.configure(2) do |config|
   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
         sudo apt-get update
         sudo apt-get install docker-ce docker-ce-cli containerd.io -y
-        docker network create jenkins
-        sudo sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
-        sudo systemctl restart sshd
+        sudo docker network create jenkins
+        sudo docker build -t fred13/jenkins -f ./Docker/Jenkins/Dockerfile.jenkins .
+        sudo chmod +x ./Docker/Jenkins/*.sh
+        sudo ./Docker/Jenkins/docker_socket_run.sh
+        sudo ./Docker/Jenkins/jenkins_server_run.sh
       SHELL
     end
 
