@@ -1,0 +1,50 @@
+---
+
+  - hosts: all
+
+    tasks:
+
+      - name: install latest docker module on host
+        pip:
+          name: docker
+          state: latest
+
+      - name: Create a network
+        docker_network:
+          name: jenkins
+
+      - name: Deploy Docker Socket
+        docker_container:
+          name: jenkins-docker
+          image: docker:dind
+          privileged: yes
+          detach: yes
+          published_ports:
+            - "2376:2376"
+          volumes:
+            - jenkins-docker-certs:/certs/client
+            - jenkins-data:/var/jenkins_home
+          env:
+            DOCKER_TLS_CERTDIR: "/certs"
+          networks:
+            - name: jenkins
+              aliases: docker
+
+      - name: Deploy Jenkins Server
+        docker_container:
+          name: jenkins-blueocean
+          image: fred13/jenkins:latest
+          privileged: yes
+          detach: yes
+          published_ports:
+            - "8080:8080"
+            - "50000:50000"
+          volumes:
+            - jenkins-data:/var/jenkins_home
+            - jenkins-docker-certs:/certs/client:ro
+          env:
+            DOCKER_HOST: "tcp://docker:2376"
+            DOCKER_CERT_PATH: "/certs/client"
+            DOCKER_TLS_VERIFY: "1"
+          networks:
+            - name: jenkins
