@@ -32,7 +32,7 @@
 
       - name: Deploy Jenkins Server
         docker_container:
-          name: jenkins-blueocean
+          name: jenkins
           image: fred13/jenkins:latest
           privileged: yes
           detach: yes
